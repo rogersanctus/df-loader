@@ -18,7 +18,7 @@ Installing
 Just download and extract this library into your project folder and use it. Or install it via haxelib:
 
 ```
-haxelib git df-loader https://github.com/rogersanctus/df-loader.git
+haxelib git df-loader https://github.com/rogersanctus/df-loader.git haxelib
 ```
 
 A simple SpriteSheet test:
