@@ -7,15 +7,21 @@ import nme.display.BitmapData;
 import nme.geom.Point;
 import nme.geom.Rectangle;
 
+/**
+ * This class extends TilesheetEx to parse the SpriteSheet Xml file.
+ * @author Rogério
+ */
 class SpriteSheet extends TilesheetEx
-{
-	private var width: Int;
-	private var height: Int;
-	
+{	
 	#if flash
 	private var img: BitmapData;
 	#end
 	
+	/**
+	 * Receive a Xml content from a DarkFunction SpriteSheet file and parse it.
+	 * @param xmlString			The xml content of the SpriteSheet file.
+	 * @param imgPath			The path where is the SpriteSheet image file in.
+	 */
 	public function new( xmlString: String, imgPath: String )
 	{		
 		var xml = new Fast( Xml.parse(xmlString) );

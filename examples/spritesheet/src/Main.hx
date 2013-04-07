@@ -9,7 +9,7 @@ import nme.Lib;
 import dfl.display.SpriteSheet;
 
 /**
- * ...
+ * An example of loading and showing sprites from a DarkFunctio spritesheet file.
  * @author Rogério Santos
  */
 
@@ -27,10 +27,17 @@ class Main extends Sprite
 
 	private function init(e) 
 	{
+		/* Create a spritesheet object, passing the xml content of the spritesheet.sprites
+		 *  and the path where is the image of this spritesheet.
+		 */
 		var sprs = new SpriteSheet( Assets.getText("assets/spritesheet.sprites"), "assets" );
 		
+		// The Tilelayer where the sprites will be drawn.
 		var layer = new TileLayer(sprs, false);
 		
+		/* Create TileSprites with the names of each sprite
+		 * you want to use
+		 */
 		var spr1: TileSprite = new TileSprite("/sprite/0");
 		var spr2: TileSprite = new TileSprite("/sprite/1");
 		
@@ -40,10 +47,13 @@ class Main extends Sprite
 		spr2.x = 128;
 		spr2.y = 48;		
 		
+		// Add them to the layer.
 		layer.addChild(spr1);
 		layer.addChild(spr2);
-		
+
 		addChild(layer.view);
+		
+		// And render the layer, so the sprites can be drawn.
 		layer.render();
 	}
 	

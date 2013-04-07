@@ -4,16 +4,34 @@ import haxe.xml.Fast;
 import nme.Assets;
 
 /**
- * ...
+ * This class is responsible for the parsing proccess of the DarkFunction
+ * anim Xml file.
  * @author Rogério
  */
-
 class Animations
 {
-	private var spriteSheet: SpriteSheet;
+	/**
+	 * The spriteSheet used by the animations on this animations file. It
+	 * is set by the Animations class.
+	 */
+	public var spriteSheet(default, null): SpriteSheet;
+	
+	/**
+	 * The Animation list of the animations described by the anim Xml file.
+	 * You can use this list to acess each animation and then drawn it on a
+	 * TileLayer.
+	 */
 	public var anims(default, null): Hash<Animation>;
 	
-	public function new( xmlString: String, imgPath: String, dataPath: String, smooth: Bool = false )
+	/**
+	 * The Animations constructor.
+	 * @param xmlString			The anim Xml content. This is NOT the file name.
+	 * @param imgPath			The path where your SpriteSheet image is on.
+	 * @param dataPath			The path where are your SpriteSheet and Animation Xml files (.anim and .sprites).
+	 *							The ones generates by the DarkFunction editor. This path can be
+	 *							the same as imgPath.
+	 */
+	public function new( xmlString: String, imgPath: String, dataPath: String )
 	{
 		var xml = new Fast( Xml.parse(xmlString) );
 		
@@ -53,7 +71,7 @@ class Animations
 				var animName = animNode.att.name,
 					loops = Std.parseInt(animNode.att.loops);
 					
-				var animation = new Animation(spriteSheet, loops, smooth);
+				var animation = new Animation(loops);
 				anims.set( animName, animation );
 
 				var cellsNode = animNode.elements;
