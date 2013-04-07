@@ -65,12 +65,6 @@ layer.render();
 
 _More samples at examples directory._
 
-**Important:** This current version use a layer for each animation, what is not a good thing for performance, because TileLayer use a batch system. 
-
-TODO
-----
-- To use another way to do animations.
-
 Known issues
 ------------
 
