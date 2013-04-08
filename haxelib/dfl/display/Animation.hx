@@ -111,7 +111,13 @@ class Animation
 			return;
 		}
 		
-		if ( _currLoop <= loops )
+		// Infinite loops
+		if ( loops == 0 )
+		{
+			_currLoop = -1;
+		}
+		
+		if ( _currLoop < loops )
 		{
 
 			if ( _currCell >= 0 && _currCell <= cells.length )
@@ -127,14 +133,9 @@ class Animation
 					}
 					// End of animation cicle
 					else
-					{
-						// Infinite loops
-						if ( loops == 0 )
-						{
-							_currLoop = 0;
-						}
+					{						
 						// Next loop
-						else if( loops > 0 )
+						if( loops > 0 )
 						{
 							_currLoop++;					
 						}
