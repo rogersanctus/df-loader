@@ -139,7 +139,11 @@ class Animation
 						{
 							_currLoop++;					
 						}
-						_currCell = 0;
+						// Don't go to the beginning if on the last loop
+						if( _currLoop != loops )
+						{
+							_currCell = 0;
+						}
 					}
 					_cellTime = 0;
 					
