@@ -14,14 +14,14 @@
       <spr name="/sprite/1" x="0" y="0" z="0"/>
     </cell>
   </anim>
-  <anim name="other" loops="0">
-    <cell index="0" delay="8">
+  <anim name="other" loops="3">
+    <cell index="0" delay="18">
       <spr name="/sprite/0" x="0" y="0" z="0" flipH="1"/>
     </cell>
-    <cell index="1" delay="10">
+    <cell index="1" delay="20">
       <spr name="/sprite/0" x="0" y="0" z="0" flipV="1"/>
     </cell>
-    <cell index="2" delay="10">
+    <cell index="2" delay="100">
       <spr name="/sprite/1" x="0" y="0" z="0" angle="90.0"/>
     </cell>
   </anim>
