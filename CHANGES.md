@@ -1,7 +1,7 @@
 Changelog
 =========
 
-The entire was changed since last commit.
+The entire project was changed since last commit.
 
  - Now the classes names begin with Df (the acronym of DarkFunction), so the Animation class is now
    DfAnimation. This was done to allow the project to be easy used with other libraries.
