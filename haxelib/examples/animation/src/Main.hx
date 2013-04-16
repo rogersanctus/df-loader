@@ -1,12 +1,12 @@
 package ;
 
-import aze.display.TileLayer;
 import nme.Assets;
 import nme.display.Sprite;
 import nme.events.Event;
 import nme.Lib;
-import dfl.display.Animations;
-import dfl.display.Animation;
+import dfl.display.DfRenderer;
+import dfl.display.DfAnimations;
+import dfl.display.DfAnimation;
 import haxe.Timer;
 
 /**
@@ -16,10 +16,10 @@ import haxe.Timer;
 
 class Main extends Sprite 
 {
-	private var animations: Animations;
-	private var animList: Array<Animation>;
+	private var animations: DfAnimations;
+	private var animList: Array<DfAnimation>;
 	
-	private var tileLayer: TileLayer;
+	private var renderer: DfRenderer;
 	
 	private var oldTime: Float;
 
@@ -37,17 +37,17 @@ class Main extends Sprite
 
 	private function init(e) 
 	{
-		animations = new Animations( Assets.getText("assets/animation.anim"), "assets", "assets" );
+		animations = new DfAnimations( Assets.getText("assets/animation.anim"), "assets", "assets" );
 
 		// The tile layer to render all the sprites in batch
-		tileLayer = new TileLayer( animations.spriteSheet, false );
+		renderer = new DfRenderer( null, animations, false );
 
-		animList = new Array<Animation>();
+		animList = new Array<DfAnimation>();
 		
 		/* Add each animation to the animList
 		 * checking first if it exist.
 		 */
-		if( animations.anims.exists("normal") )
+		/*if( animations.anims.exists("normal") )
 		{
 			animList.push( animations.anims.get("normal") );
 			animations.anims.get("normal").x = 40;
@@ -66,24 +66,31 @@ class Main extends Sprite
 			animList.push( animations.anims.get("other") );
 			animations.anims.get("other").x = 300;
 			animations.anims.get("other").y = 30;
-		}
+		}*/
+		var normal = new DfAnimation("normal");
+		normal.x = 40;
+		normal.y = 22;
 		
-		/* Or just add all animations */
-		/*
-		 * for( anim in animations.anims )
-		 * {
-		 *		animList.push( anim );
-		 * }
-		 */
+		var walk = new DfAnimation("walk");
+		walk.x = 240;
+		walk.y = 120;
 		
-		// Add all the animations to the tileLayer
+		var other = new DfAnimation("other");
+		other.x = 300;
+		other.y = 30;
+		
+		animList.push(normal);
+		animList.push(walk);
+		animList.push(other);
+		
+		// Add all the animations to the renderer
 		for( anim in animList )
 		{
-			tileLayer.addChild( anim.container );
+			renderer.addChild( anim );
 		}
 		
-		// And add the tilelayer view to the main sprite
-		addChild( tileLayer.view );
+		// And add the renderer view to the main sprite
+		addChild( renderer.view );
 		
 		oldTime = Timer.stamp();
 	}
@@ -100,7 +107,7 @@ class Main extends Sprite
 			anim.step(diff);
 		}
 
-		tileLayer.render();
+		renderer.render();
 	}
 	
 	static public function main() 

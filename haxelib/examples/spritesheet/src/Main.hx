@@ -1,12 +1,12 @@
 package ;
 
-import aze.display.TileLayer;
-import aze.display.TileSprite;
 import nme.Assets;
 import nme.display.Sprite;
 import nme.events.Event;
 import nme.Lib;
-import dfl.display.SpriteSheet;
+import dfl.display.DfRenderer;
+import dfl.display.DfSpritesheet;
+import dfl.display.DfSprite;
 
 /**
  * An example of loading and showing sprites from a DarkFunctio spritesheet file.
@@ -30,31 +30,31 @@ class Main extends Sprite
 		/* Create a spritesheet object, passing the xml content of the spritesheet.sprites
 		 *  and the path where is the image of this spritesheet.
 		 */
-		var sprs = new SpriteSheet( Assets.getText("assets/spritesheet.sprites"), "assets" );
+		var sprs = new DfSpritesheet( Assets.getText("assets/spritesheet.sprites"), "assets" );
 		
-		// The Tilelayer where the sprites will be drawn.
-		var layer = new TileLayer(sprs, false);
+		// The Renderer that will draw the sprites.
+		var renderer = new DfRenderer(sprs, false);
 		
-		/* Create TileSprites with the names of each sprite
+		/* Create DfSprite with the names of each sprite
 		 * you want to use
 		 */
-		var spr1: TileSprite = new TileSprite("/sprite/0");
-		var spr2: TileSprite = new TileSprite("/sprite/1");
+		var spr1 = new DfSprite("/sprite/0");
+		var spr2 = new DfSprite("/sprite/1");
 		
 		spr1.x = 64;
-		spr1.y = 32;		
+		spr1.y = 32;	
 		
 		spr2.x = 128;
 		spr2.y = 48;		
 		
-		// Add them to the layer.
-		layer.addChild(spr1);
-		layer.addChild(spr2);
+		// Add them to the renderer.
+		renderer.addChild(spr1);
+		renderer.addChild(spr2);
 
-		addChild(layer.view);
+		addChild(renderer.view);
 		
-		// And render the layer, so the sprites can be drawn.
-		layer.render();
+		// And call render, so the sprites can be drawn.
+		renderer.render();
 	}
 	
 	static public function main() 

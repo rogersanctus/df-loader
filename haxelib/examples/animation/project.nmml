@@ -12,7 +12,6 @@
 	<classpath name="../.." />
 	
 	<haxelib name="nme" />
-	<haxelib name="tilelayer" />
 	
 	<assets path="Assets" rename="assets" exclude="nme.svg" />
 	<icon path="Assets/nme.svg" />
