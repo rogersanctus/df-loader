@@ -16,8 +16,14 @@ Installing
 
 Just download and extract this library into your project folder and use it. Or install it via haxelib:
 
+*Last changes on from this repository:*
 ```
 haxelib git df-loader https://github.com/rogersanctus/df-loader.git haxelib
+```
+
+*Last release from [lib.haxe.org](http://lib.haxe.org):*
+```
+haxelib install df-loader
 ```
 
 A simple SpriteSheet test:
@@ -68,5 +74,4 @@ Known issues
 ------------
 
 - Rotations on animations will not work as expected when each cell (frame) have more than one sprite
-  with position different from the animation center point. Also if some sprite was previously rotated,
-  a new rotation will not consider the previous rotation.
+  with position different from the animation center point.
