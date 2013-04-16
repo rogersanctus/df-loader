@@ -57,7 +57,7 @@ class DfAnimation extends DfBasicContainer
 		_playing = true;
 		_currLoop = 0;
 		_currCell = 0;
-		_cellTime = 0;
+		_cellTime = 0.0;
 		
 		_canAddSprites = true;
 		
@@ -104,7 +104,7 @@ class DfAnimation extends DfBasicContainer
 			_playing = false;
 			_currLoop = 0;
 			_currCell = 0;
-			_cellTime = 0;
+			_cellTime = 0.0;
 		}
 	}
 	
@@ -115,15 +115,18 @@ class DfAnimation extends DfBasicContainer
 	 */
 	public function step( dt: Float = 1 ): Void
 	{
+		#if flash			// Only happens when target flash?
+		if ( Math.isNaN(dt) ) dt = 1;
+		#end
+		
 		debugSprite.graphics.clear();
 
 		debugSprite.graphics.beginFill( 0xFF0000, 0.45 );
-		debugSprite.graphics.drawRect( x + boundRectOffset.x, y + boundRectOffset.y, width, height );
+		debugSprite.graphics.drawRect( x + boundRectOffset.x, y + boundRectOffset.y, (width > 0)? width: 1, (height > 0)? height: 1 );
 		debugSprite.graphics.endFill();
 		
-		
 		if ( animationDef == null || !_playing )
-		{
+		{			
 			return;
 		}
 		
@@ -138,14 +141,12 @@ class DfAnimation extends DfBasicContainer
 		
 		if ( _currLoop < loops )
 		{
-
 			if ( _currCell >= 0 && _currCell <= cells.length )
 			{
 				if ( _cellTime >= cells[_currCell].delay )
-				{					
+				{
 					// Remove all previous sprites from the container
 					removeAllChildren();
-					//children.splice(0, children.length);
 					
 					if ( _currCell < cells.length - 1)
 					{
@@ -175,15 +176,13 @@ class DfAnimation extends DfBasicContainer
 				{
 					for ( spr in cells[_currCell].sprs )
 					{
-						//spr.hadTransformation = true;						
 						addChild( spr );
 					}
 					_canAddSprites = false;
 				}
 			}
-			
-			_cellTime += dt;
 		}
+		_cellTime += dt;
 	}
 	
 	private function setFlipH(flipH): Bool
@@ -226,15 +225,7 @@ class DfAnimation extends DfBasicContainer
 		for( cell in animationDef.cells )
 		{
 			for ( spr in cell.sprs )
-			{
-				var m = new Matrix();
-				m.translate(spr.x, spr.y);
-				//m.rotate(spr.rotation);
-				m.rotate(rotation);
-				
-				spr.x = m.tx;
-				spr.y = m.ty;
-				
+			{				
 				spr.rotation = rotation;
 			}
 		}

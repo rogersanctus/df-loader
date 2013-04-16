@@ -1,5 +1,8 @@
 package dfl.display;
 import dfl.display.DfRenderer;
+import nme.display.Bitmap;
+import nme.display.BitmapData;
+import nme.display.DisplayObject;
 import nme.geom.Matrix;
 import nme.geom.Point;
 import nme.geom.Rectangle;
@@ -43,6 +46,10 @@ class DfSprite extends DfBasicSprite
 	public var bounds(getBounds, null):  Rectangle;
 	
 	private var matrix: Matrix;
+	
+	#if flash
+	public var bmp(default, null): Bitmap;
+	#end
 
 	public function new(sprName: String, x: Int = 0, y: Int = 0, z: Int = 0, rotation: Float = 0.0, flipH: Bool = false, flipV: Bool = false )
 	{
@@ -80,6 +87,11 @@ class DfSprite extends DfBasicSprite
 			hadTransformation = true;
 		}
 		
+		#if flash
+		bmp = new Bitmap();
+		//bmp.y = -9999;
+		#end
+		
 		bounds = new Rectangle();
 	}
 	
@@ -100,15 +112,30 @@ class DfSprite extends DfBasicSprite
 			trace("Wrong index returned for: " + name);
 			return;
 		}
+		
+		#if flash
+		bmp.bitmapData = renderer.spritesheet.getBitmap(index);
+		//bmp.smoothing = renderer.smooth;
+		
+		matrix = getMatrix();
+		hadTransformation = true;
+		#end
 
 		width = renderer.spritesheet.rects[index].width;
 		height = renderer.spritesheet.rects[index].height;
 		
-		bounds.x = x;
-		bounds.y = y;
+		bounds.x = ( width != 0 )? -width / 2: 0;
+		bounds.y = ( height != 0 )? -height / 2: 0;
 		bounds.width = width;
 		bounds.height = height;
 	}
+	
+	#if flash
+	override public function getView():DisplayObject 
+	{
+		return bmp;
+	}
+	#end
 	
 	private function setScaleX( scaleX: Float ): Float
 	{
@@ -159,18 +186,45 @@ class DfSprite extends DfBasicSprite
 		if ( hadTransformation )
 		{
 			// Don't get accumulative transformations, start a new matrix ;)
-			var m = new Matrix();
+			var m = matrix;
+			m.identity();
 			
-			if ( rotation != 0 )
-			{
-				m.rotate(rotation);
-			}
+			#if flash
+			var halfWidth: Float = (width != 0)? width / 2: 0;
+			var halfHeight: Float = (height != 0)? height / 2: 0;
+			#end
+			
 			if ( scaleX != 0 || scaleY != 0 )
 			{
 				m.scale(scaleX, scaleY);
+				
+				#if flash
+				if ( scaleX < 0 )
+				{
+					m.translate( width, 0 );
+				}
+				if ( scaleY < 0 )
+				{
+					m.translate( 0, height );
+				}
+				#end
 			}
+			if ( rotation != 0 )
+			{
+				#if flash
+				m.translate( -halfWidth, -halfHeight );
+				#end
+				m.rotate(rotation);
+				#if flash
+				m.translate( halfWidth, halfHeight );
+				#end
+			}
+			
+			#if flash			
+			m.translate( -halfWidth, -halfHeight );
+			#end
 
-			hadTransformation = false;			
+			hadTransformation = false;
 			return matrix = m;
 		}
 		

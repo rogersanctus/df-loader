@@ -1,4 +1,5 @@
 package dfl.display;
+import nme.display.DisplayObject;
 
 /**
  * BasicSprite class
@@ -62,4 +63,11 @@ class DfBasicSprite
 	{
 		return height;
 	}
+	
+	#if flash
+	public function getView(): DisplayObject
+	{
+		return null;
+	}
+	#end
 }

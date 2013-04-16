@@ -16,10 +16,9 @@ class DfSpritesheet extends Tilesheet
 	private var indices: Hash<Int>;
 	private var numIndices: Int;
 	public var rects(default, null): Array<Rectangle>;
-	public var centerPoints(default, null): Array<Point>;
 
 	#if flash
-	private var img: BitmapData;
+	private var imgs: Array<BitmapData>;
 	#end
 	
 	/**
@@ -29,7 +28,7 @@ class DfSpritesheet extends Tilesheet
 	 */
 	public function new( xmlString: String, imgPath: String )
 	{		
-		var xml = new Fast( Xml.parse(xmlString) );
+		var xml = new Fast( Xml.parse( xmlString ) );
 		var bmpData: BitmapData;
 		
 		// We could not find an img element on the xml file
@@ -39,22 +38,21 @@ class DfSpritesheet extends Tilesheet
 			return;
 		}			
 		
-		if ( imgPath.charAt(imgPath.length - 1) != "/" || imgPath.charAt(imgPath.length - 1) != "\\" )
+		if ( imgPath.charAt( imgPath.length - 1 ) != "/" || imgPath.charAt( imgPath.length - 1 ) != "\\" )
 		{
 			imgPath += "/";
 		}
 		imgPath += xml.node.img.att.name;		
-		bmpData = Assets.getBitmapData(imgPath);
+		bmpData = Assets.getBitmapData( imgPath );
 		
 		#if flash
-		img = bmpData;
+		imgs = new Array<BitmapData>();
 		#end
 		
-		super(bmpData);
+		super( bmpData );
 		
 		indices = new Hash<Int>();
 		rects = new Array<Rectangle>();
-		centerPoints = new Array<Point>();
 		
 		var defs = xml.node.img.elements.next();
 		
@@ -64,12 +62,12 @@ class DfSpritesheet extends Tilesheet
 			
 			if( root.att.name == "/" )
 			{
-				makeSpriteList(root, "/");
+				makeSpriteList( root, "/", bmpData );
 			}
 		}
 	}
 	
-	private function makeSpriteList( dirs: Fast, path: String )
+	private function makeSpriteList( dirs: Fast, path: String, bmpData: BitmapData )
 	{
 		for ( fdir in dirs.elements )
 		{
@@ -80,26 +78,25 @@ class DfSpritesheet extends Tilesheet
 			{
 				oldpath = path;
 				path = path + dir.att.name + "/";
-				makeSpriteList( dir, path );
+				makeSpriteList( dir, path, bmpData );
 				path = oldpath;
 			}else if ( dir.name == "spr" )
 			{
 				var sprName = path + dir.att.name;
-				var x = Std.parseInt(dir.att.x),
-					y = Std.parseInt(dir.att.y),
-					w = Std.parseInt(dir.att.w),
-					h = Std.parseInt(dir.att.h);
+				var x = Std.parseInt( dir.att.x ),
+					y = Std.parseInt( dir.att.y ),
+					w = Std.parseInt( dir.att.w ),
+					h = Std.parseInt( dir.att.h );
 				
 				var center: Point = new Point(0, 0);
 				var rect = new Rectangle(x, y, w, h);
-				var size: Rectangle = new Rectangle(0, 0, w, h);
 				
 				#if flash
-				/*var bmp = new BitmapData(w, h, true, 0);
-				center.x = -size.left;
-				center.y = -size.top;
-				bmp.copyPixels(img, rect, center);
-				addDfSpriteDef( sprName, size, bmp );*/
+				var img = new BitmapData(w, h, true, 0);
+				center.x = 0;
+				center.y = 0;
+				img.copyPixels(bmpData, rect, center);
+				addDfSpriteDef( sprName, rect, img );
 				#else
 				center.x = w / 2;
 				center.y = h / 2;
@@ -119,17 +116,40 @@ class DfSpritesheet extends Tilesheet
 		return -1;
 	}
 	
+	#if !flash
 	private function addDfSpriteDef( name: String, rect: Rectangle, center: Point )
 	{
 		// Sprite definition already added
 		if( indices.exists(name) )
+		{
 			return;
+		}
 
 		indices.set(name, rects.length);
 		rects.push( rect );
-		//centerPoints.push(center);
-		// Not passing centerPoint argument anymore. (Tilesheet drawTiles don't work good with it)
-		//addTileRect( rect, null );
 		addTileRect( rect, center );
 	}
+	
+	#else
+	private function addDfSpriteDef( name: String, rect: Rectangle, img: BitmapData )
+	{
+		if ( indices.exists(name) )
+		{
+			return;
+		}
+		
+		indices.set( name, rects.length );
+		rects.push( rect );
+		imgs.push( img );
+	}
+	
+	public function getBitmap( index: Int ): BitmapData
+	{
+		if ( index >= 0 && index < imgs.length )
+		{
+			return imgs[index];
+		}
+		return null;
+	}
+	#end
 }
