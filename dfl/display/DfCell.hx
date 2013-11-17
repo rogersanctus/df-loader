@@ -5,7 +5,7 @@ package dfl.display;
  * DarkFunction do animations.
  * It also automatically sort the sprites on it by the z value
  * of each sprite.
- * @author Rogério
+ * @author rogersanctus
  */
 class DfCell
 {
@@ -48,8 +48,24 @@ class DfCell
 	/**
 	 * Add a CellSprite in this Cell sprites list.
 	 */
-	public function addSprite( spr: DfSprite )
+	public function addSprite( spr: DfSprite ): Void
 	{
 		sprs.push(spr);
+	}
+	
+	/**
+	 * Clones the Cell
+	 * @return		A new instance of the <code>DfCell</code> data.
+	 */
+	public function clone(): DfCell
+	{
+		var cloneCell = new DfCell( this.index, this.delay );
+		
+		for ( spr in sprs )
+		{
+			cloneCell.addSprite( spr.clone() );
+		}
+		
+		return cloneCell;
 	}
 }

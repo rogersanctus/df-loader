@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="Spritesheet Example" package="dfl.samples.spritesheet" version="1.0.0" company="Rogério" />
+	<app main="Main" path="bin" file="Spritesheet" />
+	
+	<window background="#ffffff" fps="60" />
+	<window width="800" height="480" unless="mobile" />
+	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
+	
+	<source path="src" />
+	<classpath name="../.." />
+	
+	<haxelib name="openfl" />
+	
+	<assets path="Assets" rename="assets" exclude="nme.svg" />
+	<icon path="Assets/openfl.svg" />
+
+</project>

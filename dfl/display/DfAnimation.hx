@@ -1,16 +1,15 @@
 package dfl.display;
 import dfl.display.DfRenderer;
-import nme.display.Sprite;
-import nme.geom.Matrix;
-import nme.geom.Point;
-import nme.geom.Transform;
+import flash.display.Sprite;
+import flash.geom.Matrix;
+import flash.geom.Point;
+import flash.geom.Transform;
 
 
 /**
- * ...
- * @author Rogério
+ * A named Animation described by the DarkFunction anim Xml file.
+ * @author rogersanctus
  */
-
 class DfAnimation extends DfBasicContainer
 {
 	/**
@@ -19,29 +18,29 @@ class DfAnimation extends DfBasicContainer
 	public var name(default, null): String;
 	
 	/**
-	 * Whereas to flip or not the animation horizontally.
+	 * Whereas to flip or not the animation horizontally. Only change this when you
+	 * have added the animation to the renderer object.
 	 */
-	public var flipH(default, setFlipH): Bool;
+	public var flipH(default, set): Bool;
 	
 	/**
-	 * Whereas to flip or not the animation vertically.
+	 * Whereas to flip or not the animation vertically. Only change this when you
+	 * have added the animation to the renderer object.
 	 */
-	public var flipV(default, setFlipV): Bool;
+	public var flipV(default, set): Bool;
 	
 	/**
-	 * Not working good to more than one sprites per cell(frame)
-	 */
-	public var rotation(getRotation, setRotation): Float;
+	 * The rotation of the animation. Not working good to more than one sprites per cell(frame)
+	 */	
+	public var rotation(get, set): Float;
 	
-	private var animationDef: DfAnimationDef;
+	private var _rotation: Float;
+	private var _animationDef: DfAnimationDef;
 	private var _playing: Bool;
 	private var _currLoop: Int;
 	private var _currCell: Int;
 	private var _cellTime: Float;	
 	private var _canAddSprites: Bool;
-
-	public var debugSprite: Sprite;
-	private var boundRectOffset: Point;
 
 	/**
 	 * Creates a new sprite with the name <code>name</code>.
@@ -52,33 +51,34 @@ class DfAnimation extends DfBasicContainer
 		super();
 		
 		this.name = name;		
-		animationDef = null;
+		_animationDef = null;
 		
 		_playing = true;
 		_currLoop = 0;
 		_currCell = 0;
-		_cellTime = 0.0;
+		_cellTime = 0;
+		_rotation = 0;
 		
 		_canAddSprites = true;
-		
-		debugSprite = new Sprite();
-		boundRectOffset = new Point();
 	}
 	
-	override private function init(renderer:DfRenderer):Dynamic 
+	override private function init(renderer:DfRenderer): Void 
 	{
-		if ( renderer != null )
+		if ( renderer == null )
 		{
-			if ( renderer.animations.anims.exists(name) )
-			{
-				animationDef = renderer.animations.anims.get(name);
-			}else
-			{
-				trace("No animation with this name: " + name + " was found.");
-			}
+			return;
 		}
-
-		super.init(renderer);
+		
+		if ( renderer.contentDef.animations.anims.exists(name) )
+		{
+			// Gets an unique animationDef data.
+			_animationDef = renderer.contentDef.animations.anims.get(name).clone();
+		}else
+		{
+			trace("No animation with this name: " + name + " was found.");
+		}		
+		
+		super.init( renderer );
 	}
 	
 	/**
@@ -109,29 +109,25 @@ class DfAnimation extends DfBasicContainer
 	}
 	
 	/**
-	 * Must be called from the main loop of the application. It will play or not the animation,
+	 * Must be called from the main loop of the application or at least at once after
+	 * the aniomation has been added to the renderer. It will play or not the animation,
 	 * as you want.
 	 * @param dt		The delta time of each frame. Default value is <code>1</code>
 	 */
 	public function step( dt: Float = 1 ): Void
-	{
-		#if flash			// Only happens when target flash?
-		if ( Math.isNaN(dt) ) dt = 1;
-		#end
+	{		
+		if ( Math.isNaN(dt) )
+		{
+			dt = 1;
+		}
 		
-		debugSprite.graphics.clear();
-
-		debugSprite.graphics.beginFill( 0xFF0000, 0.45 );
-		debugSprite.graphics.drawRect( x + boundRectOffset.x, y + boundRectOffset.y, (width > 0)? width: 1, (height > 0)? height: 1 );
-		debugSprite.graphics.endFill();
-		
-		if ( animationDef == null || !_playing )
+		if ( _animationDef == null || !_playing )
 		{			
 			return;
 		}
 		
-		var loops = animationDef.loops;
-		var cells = animationDef.cells;
+		var loops = _animationDef.loops;
+		var cells = _animationDef.cells;
 		
 		// Infinite loops
 		if ( loops == 0 )
@@ -174,8 +170,13 @@ class DfAnimation extends DfBasicContainer
 				// Add all the sprites for this cell
 				if ( _canAddSprites  )
 				{
-					for ( spr in cells[_currCell].sprs )
+					// Add sprites for cell from the end to the start
+					// to be in the same order as shown on the DarkFunction editor
+					//for ( spr in cells[_currCell].sprs )
+					var sprs_length: Int = cells[_currCell].sprs.length;
+					for( i_spr in 0 ... sprs_length )
 					{
+						var spr: DfSprite = cells[_currCell].sprs[ sprs_length - i_spr - 1 ];
 						addChild( spr );
 					}
 					_canAddSprites = false;
@@ -183,16 +184,20 @@ class DfAnimation extends DfBasicContainer
 			}
 		}
 		_cellTime += dt;
-	}
+	}	
 	
-	private function setFlipH(flipH): Bool
+	/**
+	 * Flip the sprite horizontally.
+	 * @param	flipH		Whether to flip or not
+	 */
+	private function set_flipH(flipH): Bool
 	{
 		// Apply the flip to all sprites of all the cells (frames)
-		for ( cell in animationDef.cells )
+		for ( cell in _animationDef.cells )
 		{
 			for ( spr in cell.sprs )
 			{
-				spr.scaleX = -spr.scaleX;
+				spr.flipH = flipH;
 				var newXoffs = - width + Math.abs(width - spr.x);
 				spr.x = newXoffs;
 			}
@@ -200,14 +205,18 @@ class DfAnimation extends DfBasicContainer
 		return this.flipH = flipH;
 	}
 	
-	private function setFlipV(flipV): Bool
+	/**
+	 * Flip the sprite vertically.
+	 * @param	flipV		Whether to flip or not
+	 */
+	private function set_flipV(flipV): Bool
 	{
 		// Apply the flip to all sprites of all the cells
-		for ( cell in animationDef.cells )
+		for ( cell in _animationDef.cells )
 		{
 			for ( spr in cell.sprs )
 			{
-				spr.scaleY = -spr.scaleY;
+				spr.flipV = flipV;
 				var newYoffs = - height + Math.abs(height - spr.y);
 				spr.y = newYoffs;
 			}
@@ -215,38 +224,42 @@ class DfAnimation extends DfBasicContainer
 		return this.flipV = flipV;
 	}
 	
-	private function getRotation(): Float
+	private function get_rotation(): Float
 	{
-		return rotation;
+		return _rotation;
 	}
 	
-	private function setRotation( rotation: Float ): Float
+	private function set_rotation( rotation: Float ): Float
 	{
-		for( cell in animationDef.cells )
+		for( cell in _animationDef.cells )
 		{
 			for ( spr in cell.sprs )
 			{				
 				spr.rotation = rotation;
 			}
 		}
-		return this.rotation = rotation;
+		return _rotation = rotation;
 	}
 	
-	override private function getWidth(): Float 
+	/**
+	 * Calculates the animation container width based on it's content.
+	 * It wont work good at all cases.
+	 * @return		The animation width.
+	 */
+	override private function get_width(): Float 
 	{
-		if ( _currCell >= 0 && _currCell < animationDef.cells.length )
+		if ( _currCell >= 0 && _currCell < _animationDef.cells.length )
 		{
 			// Only one spr in this cell
-			if ( animationDef.cells[_currCell].sprs.length == 1 )
+			if ( _animationDef.cells[_currCell].sprs.length == 1 )
 			{
-				boundRectOffset.x = -animationDef.cells[_currCell].sprs[0].bounds.width / 2;
-				return animationDef.cells[_currCell].sprs[0].bounds.width;
+				return _animationDef.cells[_currCell].sprs[0].bounds.width;
 			}
 			
 			var minX: Float = Math.POSITIVE_INFINITY,
 				maxX: Float = Math.NEGATIVE_INFINITY;
 			
-			for ( spr in animationDef.cells[_currCell].sprs )
+			for ( spr in _animationDef.cells[_currCell].sprs )
 			{
 				minX = Math.min( minX, spr.x + spr.bounds.left );
 				maxX = Math.max( maxX, spr.x + spr.bounds.left + spr.bounds.width );
@@ -254,28 +267,31 @@ class DfAnimation extends DfBasicContainer
 			
 			if ( maxX > minX )
 			{
-				boundRectOffset.x = minX;
 				return width = maxX - minX;
 			}
 		}
 		return 0;
 	}
 	
-	override private function getHeight(): Float 
+	/**
+	 * Calculates the animation container height based on it's content.
+	 * It wont work good at all cases.
+	 * @return		The animation height.
+	 */
+	override private function get_height(): Float 
 	{
-		if ( _currCell >= 0 && _currCell < animationDef.cells.length )
+		if ( _currCell >= 0 && _currCell < _animationDef.cells.length )
 		{
 			// Only one spr in this cell
-			if ( animationDef.cells[_currCell].sprs.length == 1 )
+			if ( _animationDef.cells[_currCell].sprs.length == 1 )
 			{
-				boundRectOffset.y = -animationDef.cells[_currCell].sprs[0].bounds.height / 2;
-				return animationDef.cells[_currCell].sprs[0].bounds.height;
+				return _animationDef.cells[_currCell].sprs[0].bounds.height;
 			}
 			
 			var minY: Float = Math.POSITIVE_INFINITY,
 				maxY: Float = Math.NEGATIVE_INFINITY;
 			
-			for ( spr in animationDef.cells[_currCell].sprs )
+			for ( spr in _animationDef.cells[_currCell].sprs )
 			{
 				minY = Math.min( minY, spr.y + spr.bounds.top );
 				maxY = Math.max( maxY, spr.y + spr.bounds.top + spr.bounds.height );
@@ -283,11 +299,9 @@ class DfAnimation extends DfBasicContainer
 			
 			if ( maxY > minY )
 			{
-				boundRectOffset.y = minY;
 				return height = maxY - minY;
 			}
 		}
 		return 0;
-	}
-	
+	}	
 }

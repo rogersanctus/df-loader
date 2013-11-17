@@ -1,25 +1,20 @@
 package dfl.display;
 
 import haxe.xml.Fast;
-import nme.Assets;
-import nme.display.Tilesheet;
-import nme.display.BitmapData;
-import nme.geom.Point;
-import nme.geom.Rectangle;
+import openfl.Assets;
+import flash.display.BitmapData;
+import flash.geom.Point;
+import flash.geom.Rectangle;
+import openfl.display.Tilesheet;
 
 /**
- * This class extends Tilesheet to parse the SpriteSheet Xml file.
- * @author Rogério
+ * This class extends Tilesheet to parse the DarkFunction Spritesheet Xml file.
+ * @author rogersanctus
  */
 class DfSpritesheet extends Tilesheet
 {
-	private var indices: Hash<Int>;
-	private var numIndices: Int;
+	private var indices: Map<String, Int>;
 	public var rects(default, null): Array<Rectangle>;
-
-	#if flash
-	private var imgs: Array<BitmapData>;
-	#end
 	
 	/**
 	 * Receive a Xml content from a DarkFunction SpriteSheet file and parse it.
@@ -43,15 +38,12 @@ class DfSpritesheet extends Tilesheet
 			imgPath += "/";
 		}
 		imgPath += xml.node.img.att.name;		
+		//bmpData = Assets.getBitmapData( imgPath );
 		bmpData = Assets.getBitmapData( imgPath );
-		
-		#if flash
-		imgs = new Array<BitmapData>();
-		#end
 		
 		super( bmpData );
 		
-		indices = new Hash<Int>();
+		indices = new Map<String, Int>();
 		rects = new Array<Rectangle>();
 		
 		var defs = xml.node.img.elements.next();
@@ -83,29 +75,37 @@ class DfSpritesheet extends Tilesheet
 			}else if ( dir.name == "spr" )
 			{
 				var sprName = path + dir.att.name;
-				var x = Std.parseInt( dir.att.x ),
-					y = Std.parseInt( dir.att.y ),
-					w = Std.parseInt( dir.att.w ),
-					h = Std.parseInt( dir.att.h );
+				var x: Int = 0,
+					y: Int = 0,
+					w: Int = 0,
+					h: Int = 0;
+					
+				var vx = Std.parseInt( dir.att.x );
+				var vy = Std.parseInt( dir.att.y );
+				var vw = Std.parseInt( dir.att.w );
+				var vh = Std.parseInt( dir.att.h );
+				
+				if ( vx != null ) x = vx;
+				if ( vy != null ) y = vy;
+				if ( vw != null ) w = vw;
+				if ( vh != null ) h = vh;
 				
 				var center: Point = new Point(0, 0);
 				var rect = new Rectangle(x, y, w, h);
 				
-				#if flash
-				var img = new BitmapData(w, h, true, 0);
-				center.x = 0;
-				center.y = 0;
-				img.copyPixels(bmpData, rect, center);
-				addDfSpriteDef( sprName, rect, img );
-				#else
 				center.x = w / 2;
 				center.y = h / 2;
 				addDfSpriteDef( sprName, rect, center );
-				#end				
 			}
 		}
 	}
 	
+	/**
+	 * Gets a sprite index by it name.
+	 * @param	name		The name of the sprite to be retrieved.
+	 * @return				The index of the sprite or -1 if no sprite was found with
+	 * 						the passed <code>name</code>.
+	 */
 	public function getSprite( name: String ): Int
 	{
 		if( indices.exists(name) )
@@ -114,9 +114,8 @@ class DfSpritesheet extends Tilesheet
 		}
 		// Not found a indice to this sprite name
 		return -1;
-	}
+	}	
 	
-	#if !flash
 	private function addDfSpriteDef( name: String, rect: Rectangle, center: Point )
 	{
 		// Sprite definition already added
@@ -124,32 +123,10 @@ class DfSpritesheet extends Tilesheet
 		{
 			return;
 		}
-
-		indices.set(name, rects.length);
-		rects.push( rect );
-		addTileRect( rect, center );
-	}
-	
-	#else
-	private function addDfSpriteDef( name: String, rect: Rectangle, img: BitmapData )
-	{
-		if ( indices.exists(name) )
-		{
-			return;
-		}
 		
-		indices.set( name, rects.length );
-		rects.push( rect );
-		imgs.push( img );
+		indices.set( name, rects.length );		
+		var i: Int = indices.get( name );		
+		rects[ i ] = rect;
+		addTileRect( rects[i], center );
 	}
-	
-	public function getBitmap( index: Int ): BitmapData
-	{
-		if ( index >= 0 && index < imgs.length )
-		{
-			return imgs[index];
-		}
-		return null;
-	}
-	#end
 }

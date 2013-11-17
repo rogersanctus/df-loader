@@ -1,37 +1,37 @@
 package dfl.display;
 
 import haxe.xml.Fast;
-import nme.Assets;
+import openfl.Assets;
 
 /**
- * This class is responsible for the parsing proccess of the DarkFunction
+ * This class is responsible for the parsing process of the DarkFunction
  * anim Xml file.
- * @author Rogério
+ * @author rogersanctus
  */
 class DfAnimations
 {
 	/**
 	 * The spriteSheet used by the animations on this animations file. It
-	 * is set by the Animations class.
+	 * is set by the <code>DfAnimations</code> class.
 	 */
 	public var spritesheet(default, null): DfSpritesheet;
 	
 	/**
-	 * The Animation list of the animations described by the anim Xml file.
-	 * You can use this list to acess each animation and then drawn it on a
-	 * TileLayer.
+	 * The Animation list of the animations described by the DarkFunction anim Xml file.
+	 * You can use this list to acess each animation and then drawn it on
+	 * the <code>DfRenderer</code>.
 	 */
-	public var anims(default, null): Hash<DfAnimationDef>;
+	public var anims(default, null): Map<String, DfAnimationDef>;
 	
 	/**
 	 * The Animations constructor.
 	 * @param xmlString			The anim Xml content. This is NOT the file name.
 	 * @param imgPath			The path where your SpriteSheet image is on.
 	 * @param dataPath			The path where are your SpriteSheet and Animation Xml files (.anim and .sprites).
-	 *							The ones generates by the DarkFunction editor. This path can be
-	 *							the same as imgPath.
+	 *							The ones generates by the DarkFunction editor. If you dont pass this param it will be
+	 *							the same as <code>imgPath</code>. 
 	 */
-	public function new( xmlString: String, imgPath: String, dataPath: String )
+	public function new( xmlString: String, imgPath: String, ?dataPath: String )
 	{
 		var xml = new Fast( Xml.parse(xmlString) );
 		
@@ -47,6 +47,11 @@ class DfAnimations
 			return;
 		}
 		
+		if ( dataPath == null )
+		{
+			dataPath = imgPath;
+		}
+		
 		if ( dataPath.charAt(dataPath.length - 1) != "/" || dataPath.charAt(dataPath.length - 1) != "\\" )
 		{
 			dataPath += "/";
@@ -60,7 +65,7 @@ class DfAnimations
 			return;
 		}
 		
-		anims = new Hash<DfAnimationDef>();
+		anims = new Map<String, DfAnimationDef>();
 		
 		var animsNode = xml.node.animations.elements;
 		

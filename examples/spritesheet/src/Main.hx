@@ -1,16 +1,17 @@
 package ;
 
-import nme.Assets;
-import nme.display.Sprite;
-import nme.events.Event;
-import nme.Lib;
+import openfl.Assets;
+import flash.display.Sprite;
+import flash.events.Event;
+import flash.Lib;
 import dfl.display.DfRenderer;
+import dfl.display.DfContentDef;
 import dfl.display.DfSpritesheet;
 import dfl.display.DfSprite;
 
 /**
  * An example of loading and showing sprites from a DarkFunctio spritesheet file.
- * @author Rogério Santos
+ * @author rogersanctus
  */
 
 class Main extends Sprite 
@@ -33,23 +34,36 @@ class Main extends Sprite
 		var sprs = new DfSpritesheet( Assets.getText("assets/spritesheet.sprites"), "assets" );
 		
 		// The Renderer that will draw the sprites.
-		var renderer = new DfRenderer(sprs, false);
+		var renderer = new DfRenderer( new DfContentDef(sprs), false);
 		
 		/* Create DfSprite with the names of each sprite
 		 * you want to use
 		 */
 		var spr1 = new DfSprite("/sprite/0");
 		var spr2 = new DfSprite("/sprite/1");
+		var spr3 = new DfSprite("/sprite/0");
+		var spr4 = new DfSprite("/sprite/1");
 		
 		spr1.x = 64;
 		spr1.y = 32;	
 		
-		spr2.x = 128;
-		spr2.y = 48;		
+		spr2.x = 324;
+		spr2.y = 48;
+		
+		spr3.x = spr1.x;
+		spr3.y = spr1.y + 48;
+		
+		spr4.x = spr2.x;
+		spr4.y = spr2.y + 48;
 		
 		// Add them to the renderer.
 		renderer.addChild(spr1);
 		renderer.addChild(spr2);
+		renderer.addChild(spr3);
+		renderer.addChild(spr4);
+		
+		spr3.flipV = true;
+		spr4.rotation = 135 * Math.PI / 180;	// Rotate 135 degrees.
 
 		addChild(renderer.view);
 		
@@ -60,8 +74,8 @@ class Main extends Sprite
 	static public function main() 
 	{
 		var stage = Lib.current.stage;
-		stage.scaleMode = nme.display.StageScaleMode.NO_SCALE;
-		stage.align = nme.display.StageAlign.TOP_LEFT;
+		stage.scaleMode = flash.display.StageScaleMode.NO_SCALE;
+		stage.align = flash.display.StageAlign.TOP_LEFT;
 		
 		Lib.current.addChild(new Main());
 	}
