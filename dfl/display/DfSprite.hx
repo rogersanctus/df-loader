@@ -120,7 +120,7 @@ class DfSprite extends DfBasicSprite
 		
 		if ( index == -1 )
 		{
-			trace("Wrong index returned for: " + name);
+			trace("Wrong index returned for: " + name + ". Is there a sprite with this name on the spritesheet?");
 			return;
 		}
 		
