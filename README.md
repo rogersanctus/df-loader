@@ -23,7 +23,7 @@ Just download and extract this library into your project folder and use it. Or i
 
 *Last changes on from this repository:*
 ```
-haxelib git df-loader https://github.com/rogersanctus/df-loader.git haxelib
+haxelib git df-loader https://github.com/rogersanctus/df-loader.git
 ```
 
 *Last release from [lib.haxe.org](http://lib.haxe.org):*
