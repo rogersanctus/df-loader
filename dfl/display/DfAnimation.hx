@@ -82,6 +82,7 @@ class DfAnimation extends DfBasicContainer
 		
 		applyFlipH();
 		applyFlipV();
+		applyRotation();
 	}
 	
 	/**
@@ -254,14 +255,23 @@ class DfAnimation extends DfBasicContainer
 	
 	private function set_rotation( rotation: Float ): Float
 	{
-		for( cell in _animationDef.cells )
+		_rotation = rotation;
+		applyRotation();
+		return _rotation;
+	}	
+	
+	private function applyRotation(): Void
+	{
+		if ( renderer != null )
 		{
-			for ( spr in cell.sprs )
-			{				
-				spr.rotation = rotation;
+			for( cell in _animationDef.cells )
+			{
+				for ( spr in cell.sprs )
+				{				
+					spr.rotation = rotation;
+				}
 			}
 		}
-		return _rotation = rotation;
 	}
 	
 	/**
