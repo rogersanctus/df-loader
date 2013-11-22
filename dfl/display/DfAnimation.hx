@@ -79,6 +79,9 @@ class DfAnimation extends DfBasicContainer
 		}		
 		
 		super.init( renderer );
+		
+		applyFlipH();
+		applyFlipV();
 	}
 	
 	/**
@@ -190,19 +193,12 @@ class DfAnimation extends DfBasicContainer
 	 * Flip the sprite horizontally.
 	 * @param	flipH		Whether to flip or not
 	 */
-	private function set_flipH(flipH): Bool
+	private function set_flipH( flipH ): Bool
 	{
-		// Apply the flip to all sprites of all the cells (frames)
-		for ( cell in _animationDef.cells )
-		{
-			for ( spr in cell.sprs )
-			{
-				spr.flipH = flipH;
-				var newXoffs = - width + Math.abs(width - spr.x);
-				spr.x = newXoffs;
-			}
-		}
-		return this.flipH = flipH;
+		this.flipH = flipH;
+		applyFlipH();
+		
+		return this.flipH;
 	}
 	
 	/**
@@ -211,17 +207,44 @@ class DfAnimation extends DfBasicContainer
 	 */
 	private function set_flipV(flipV): Bool
 	{
-		// Apply the flip to all sprites of all the cells
-		for ( cell in _animationDef.cells )
+		this.flipV = flipV;
+		applyFlipV();
+		
+		return this.flipV;
+	}
+	
+	private function applyFlipH(): Void
+	{
+		if ( renderer != null )
 		{
-			for ( spr in cell.sprs )
+			// Apply the flip to all sprites of all the cells (frames)
+			for ( cell in _animationDef.cells )
 			{
-				spr.flipV = flipV;
-				var newYoffs = - height + Math.abs(height - spr.y);
-				spr.y = newYoffs;
+				for ( spr in cell.sprs )
+				{
+					spr.flipH = this.flipH;
+					var newXoffs = - width + Math.abs(width - spr.x);
+					spr.x = newXoffs;
+				}
 			}
 		}
-		return this.flipV = flipV;
+	}
+	
+	private function applyFlipV(): Void
+	{
+		if ( renderer != null )
+		{			
+			// Apply the flip to all sprites of all the cells
+			for ( cell in _animationDef.cells )
+			{
+				for ( spr in cell.sprs )
+				{
+					spr.flipV = this.flipV;
+					var newYoffs = - height + Math.abs(height - spr.y);
+					spr.y = newYoffs;
+				}
+			}
+		}
 	}
 	
 	private function get_rotation(): Float
