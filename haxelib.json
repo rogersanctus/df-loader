@@ -8,6 +8,6 @@
   "releasenote" : "Added suport to Haxe 3 and changed to OpenFL",
   "contributors" : ["rogersanctus"],
   "dependencies" : {
-    "openfl" : "1.1.1"
+    "openfl" : ""
   }
 }
